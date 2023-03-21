@@ -28,11 +28,14 @@ int main(int argc, string argv[])
 {
     // ensure proper usage
     // TODO #1
-    int wordSizeFromArg = atoi(argv[1]);
     if (argc != 2)
     {
+        printf("You must insert two arguments. Ex.: ./wordle #[number]\n");
         return 1;
     }
+
+    int wordSizeFromArg = atoi(argv[1]);
+
 
     int wordsize = 0;
 
@@ -42,7 +45,8 @@ int main(int argc, string argv[])
     {
         wordsize = wordSizeFromArg;
 
-    } else
+    }
+    else
     {
         printf("Error: wordsize must be either 5, 6, 7, or 8\n");
         return 1;
@@ -97,12 +101,13 @@ int main(int argc, string argv[])
         // Calculate score for the guess
         int score = check_word(guess, wordsize, status, choice);
 
+        // for (int p = 0; p < wordsize; p++)
+        // {
+        //     printf("%d", status[p]);
+        // }
+
         printf("Guess %i: ", i + 1);
 
-        // for (int e = 0; guess[e]; e++)
-        // {
-        //     printf("\nstatus: %d", status[i]);
-        // }
         // Print the guess
         print_word(guess, wordsize, status);
 
@@ -116,6 +121,15 @@ int main(int argc, string argv[])
 
     // Print the game's result
     // TODO #7
+    if (won == true)
+    {
+        printf("You won!\n");
+    }
+    else
+    {
+        printf("You lost\n");
+        printf("Target word was: %s\n", choice);
+    }
 
     // that's all folks!
     return 0;
@@ -127,12 +141,11 @@ string get_guess(int wordsize)
 
     // ensure users actually provide a guess that is the correct length
     // TODO #3
-
     while (wordsize != strlen(guess))
     {
         guess = get_string("Input a %d-letter word: ", wordsize);
     }
-    for(int i = 0; guess[i]; i++)
+    for (int i = 0; guess[i]; i++)
     {
         guess[i] = tolower(guess[i]);
     }
@@ -152,30 +165,24 @@ int check_word(string guess, int wordsize, int status[], string choice)
             if ((j == k) && (guess[j] == choice[k]))
             {
                 status[j] = EXACT;
+                break;
             }
             else if ((j != k) && guess[j] == choice[k])
             {
                 status[j] = CLOSE;
-             }
+                break;
+            }
             else
             {
                 status[j] = WRONG;
-                continue;
             }
-            // printf("%d -- %d\n", j, k);
-            printf("guess: %c -- choice: %s -- status: %d ---- j: %d\n",guess[j], choice, status[j],j);
-            score = score + status[j];
-        }
-    }
-    printf("%d\n", score);
-    // HINTS
-    // iterate over each letter of the guess
-        // iterate over each letter of the choice
-            // compare the current guess letter to the current choice letter
-                // if they're the same position in the word, score EXACT points (green) and break so you don't compare that letter further
-                // if it's in the word, but not the right spot, score CLOSE point (yellow)
-        // keep track of the total score by adding each individual letter's score from above
+            // used for debugging
+            // printf("guess: %c -- choice: %s -- status: %d ---- j: %d ---- k: %d \n",guess[j], choice, status[j],j,k);
 
+        }
+        score = score + status[j];
+
+    }
     return score;
 }
 
@@ -183,24 +190,24 @@ void print_word(string guess, int wordsize, int status[])
 {
     // print word character-for-character with correct color coding, then reset terminal font to normal
     // TODO #6
-    for (int i = 0; guess[i]; i++)
+    for (int k = 0; k < strlen(guess); k++)
     {
-        switch (status[i])
+        // printf("\n%d\n", status[k]);
+
+        switch (status[k])
         {
             case EXACT:
-                printf(GREEN"%c"RESET, guess[i]);
-                continue;
+                printf(GREEN"%c"RESET, guess[k]);
+                break;
 
             case CLOSE:
-                printf(YELLOW"%c"RESET, guess[i]);
-                continue;
+                printf(YELLOW"%c"RESET, guess[k]);
+                break;
 
             case WRONG:
-                printf(RED"%c"RESET, guess[i]);
+                printf(RED"%c"RESET, guess[k]);
                 break;
         }
-        printf("\n%d\n", status[i]);
     }
     printf("\n");
-    return;
 }
